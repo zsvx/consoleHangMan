@@ -1,0 +1,99 @@
+# imports necessary stuff
+import random
+import sys
+# game loop, duh
+def game_loop():
+  # starting the game
+  gm_selection = input('Welcome to HangMan!\nWould you like to play easy, medium, or hard?\n')
+  # dunno how to import dictionarys so bam here are 3 sets of 10 lists
+  easy_words = ['man', 'cat', 'dog', 'mate', 'frog', 'ninja', 'mouse', 'owl', 'kid', 'fake']
+  medium_words = ['lockbox', 'tragedy', 'euphoria', 'maniacle', 'atrocious', 'deliberate', 'candycorn', 'anchorage', 'loophole', 'possibility']
+  hard_words = ['flabbergasted', 'blackjacking', 'subjectivize', 'crackerjacks', 'stockjobbing', 'backflipping', 'extravaganza', 'polygamizing', 'antikickback', 'homozygously']
+  # forces the user guess something possible and selects a random word from an array based on gamemode
+  gm = 0
+  while gm < 1:
+    if gm_selection.lower() == 'easy':
+      gm = 1
+      randword = random.choice(easy_words)
+    elif gm_selection.lower() == 'medium':
+      gm = 2
+      randword = random.choice(medium_words)
+    elif gm_selection.lower() == 'hard':
+      gm = 3
+      randword = random.choice(hard_words)
+    else:
+      gm_selection = input('\nSorry, please pick a valid choice.')
+    # finds length of a list and draws '_ ' per each character
+  letters_amt = len(randword)
+  user_word = '_ ' * letters_amt
+  print(user_word)
+  # draws the board
+  guess = input('\nPlease guess a letter.\n')
+  game_board = ['___________', ' |      |  ', ' |      -  ', ' |         ', ' |         ', ' |         ', '-----------']
+  # guessed letters = an empty list, will be filled as letters are guessed
+  guessed_letters = []
+  # sets game over as False because they haven't lost yet and incorrect to 0 because they haven't guessed yet
+  game_over = False
+  incorrect = 0
+  # game loop
+  while not game_over:
+    if guess == randword: # if guess is right, print it again then see if they want to replay
+      print("\nYes! That's it!\n")
+      print(randword)
+      print('\n'.join(game_board))
+      replay = input('\nWould you like to play again?\n')
+      while True:
+        if replay.lower() == 'yes' or replay.lower() == 'y':
+          game_loop()
+        elif replay.lower() == 'no' or replay.lower() == 'n':
+          sys.exit()
+        else:
+          replay = input('\nPlease select a valid choice: yes or no')
+    elif guess in randword: # if the guess is in the randomly generated word, do stuff
+      locations = find(randword, guess)
+      for location in locations:
+        user_word = user_word.split()
+        user_word[location] = guess
+        print(user_word)
+      guessed_letters.append(guess) # add the guess into the guessed letters list
+    else:
+      incorrect += 1  # add one incorect to the total
+      guessed_letters.append(guess)
+      print('\nNope!\n')  # for every incorrect answer, add a part to the man and change the list
+      if incorrect == 1:
+        replace(game_board, 2, ' |      O  ')
+      elif incorrect == 2:
+        replace(game_board, 3, ' |      |  ')
+      elif incorrect == 3:
+        replace(game_board, 4, ' |     /   ')
+      elif incorrect == 4:
+        replace(game_board, 4, ' |     / \ ')
+      elif incorrect == 5:
+        replace(game_board, 3, ' |     /|  ')
+      elif incorrect == 6:
+        replace(game_board, 3, ' |     /|\ ')
+        print("\nOh, no! You've lost!!\n")
+        print(randword)
+        print('\n'.join(game_board))
+        replay = input('\nWould you like to play again?\n')
+        while True:
+          if replay.lower() == 'yes' or replay.lower() == 'y':
+            game_loop()
+          elif replay.lower() == 'no' or replay.lower() == 'n':
+            sys.exit()
+          else:
+            replay = input('\nPlease select a valid choice: yes or no\n')
+
+    print('\n'.join(game_board))
+    print('Letters guessed: ' + str(guessed_letters))
+    guess = input('\nGuess again.\n')
+# function to find a character(ch) in a string(st) and where it occurs. outputs a list
+def find(st, ch):
+  return [i for i, ltr in enumerate(st) if ltr == ch]
+
+def replace(arr, num, st):
+  arr.pop(num)
+  arr.insert(num, st)
+
+if __name__ == '__main__':
+  game_loop()
